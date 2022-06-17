@@ -62,5 +62,3 @@ for i in range(len(ipVictims)):
     ipToSpoof = ipsToBeSpoofed[i]
     #spoofedPkt(macVictim, ipVictim, ipToSpoof)
     gratutiousARP(macVictim, ipVictim, ipToSpoof)
-
-print("ARP poisoning of: " + ipVictims + " complete!")
