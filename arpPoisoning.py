@@ -66,4 +66,4 @@ while True:
             gratutiousARP(macVictim, ipVictim, ipToSpoof, interface)
         else:    
             spoofedPkt(macVictim, ipVictim, ipToSpoof, interface)
-    time.sleep(30)    
+    time.sleep(30)    #time to sleep between sending the next batch of packets
